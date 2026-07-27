@@ -10,7 +10,7 @@ const passPattern = /^[A-Z][A-Za-z0-9]{5,20}$/;
 const mobileNumberPattern = /^01[01245]\d{8}$/;
 
 export const generalFields = {
-  name: z.string(),
+  name: z.string().min(3).max(70),
   title: z.string(),
   description: z.string().min(20).max(2000),
   email: z.string().email(),
@@ -28,8 +28,8 @@ export const validate = (schema) => {
     if (result.success) {
       next();
     } else {
-      let errMsg = result.error.errors.map((err) => err.message);
-      next(new AppError(errMsg, 400));
+      let errMsg = result.error.issues.map((err) => err.message);
+      next(new AppError(errMsg.join(", "), 400));
     }
   };
 };
