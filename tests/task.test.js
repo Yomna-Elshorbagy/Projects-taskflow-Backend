@@ -83,4 +83,33 @@ describe("Task Endpoints", () => {
     expect(res.body.data.length).toBeGreaterThan(0);
     expect(res.body.data[0].title).toBe("Another Task");
   });
+  it("should verify that updating a task's status populates the statusHistory array", async () => {
+    // 1. Create a task
+    const taskRes = await request(app)
+      .post(`/projects/${projectId}/tasks`)
+      .set("authentication", adminToken)
+      .send({
+        title: "Task for Status History",
+        description: "This is a strictly over 20 characters description for the task.",
+        dueDate: "2027-12-31T00:00:00.000Z",
+        assignee: adminUserId,
+      });
+    
+    const taskId = taskRes.body.data._id;
+
+    // 2. Update the status
+    const updateRes = await request(app)
+      .put(`/projects/${projectId}/tasks/${taskId}`)
+      .set("authentication", adminToken)
+      .send({
+        status: "In Progress" // Correct enum value
+      });
+
+    expect(updateRes.statusCode).toEqual(200);
+    expect(updateRes.body.success).toBe(true);
+    expect(updateRes.body.data.statusHistory).toBeDefined();
+    expect(updateRes.body.data.statusHistory.length).toBe(1);
+    expect(updateRes.body.data.statusHistory[0].newStatus).toBe("In Progress");
+    expect(updateRes.body.data.statusHistory[0].changedBy._id.toString()).toBe(adminUserId);
+  });
 });

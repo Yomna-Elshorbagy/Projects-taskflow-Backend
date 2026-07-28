@@ -42,7 +42,15 @@ const taskSchema = new mongoose.Schema(
       type: Schema.Types.ObjectId,
       ref: "Project",
       required: true,
-    }
+    },
+    statusHistory: [
+      {
+        oldStatus: { type: String },
+        newStatus: { type: String, required: true },
+        changedBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        changedAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,

@@ -81,7 +81,18 @@ export const updateTask = catchAsyncError(async (req, res, next) => {
     return next(new AppError(messages.user.notAuthorized, 403));
   }
 
-  const updatedTask = await taskRepo.updateTask(taskId, req.body);
+  const updateData = { ...req.body };
+  if (req.body.status && req.body.status !== task.status) {
+    updateData.$push = {
+      statusHistory: {
+        oldStatus: task.status,
+        newStatus: req.body.status,
+        changedBy: req.authUser._id,
+      },
+    };
+  }
+
+  const updatedTask = await taskRepo.updateTask(taskId, updateData);
   res.json({ success: true, message: messages.task.updatedSuccessfully, data: updatedTask });
 });
 
