@@ -10,7 +10,11 @@ import {
   removeMemberVal 
 } from "./project.validation.js";
 
+import taskRouter from "../task/task.router.js";
+
 const projectRouter = Router();
+
+projectRouter.use("/:projectId/tasks", taskRouter);
 
 projectRouter.use(isAuthenticated);
 
