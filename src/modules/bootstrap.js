@@ -10,6 +10,7 @@ export const bootstrap = (app) => {
   dbConnection();
 
   app.use("/auth", allRouters.authRouter);
+  app.use("/projects", allRouters.projectRouter);
 
   app.use((req, res, next) => {
     next(new AppError(`Route Not Found ${req.originalUrl}`, 404));
