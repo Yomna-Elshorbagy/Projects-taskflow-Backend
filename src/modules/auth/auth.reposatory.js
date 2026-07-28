@@ -32,3 +32,7 @@ export const invalidateToken = async (token, userId) => {
     { new: true }
   );
 };
+
+export const findAllUsers = async (excludeId) => {
+  return await User.find({ _id: { $ne: excludeId } }).select("userName email role");
+};

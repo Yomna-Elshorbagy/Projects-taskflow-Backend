@@ -20,4 +20,6 @@ authRouter.post(
 
 authRouter.post("/logout", isAuthenticated, authControllers.logout);
 
+authRouter.get("/users", isAuthenticated, authControllers.getAllUsers);
+
 export default authRouter;

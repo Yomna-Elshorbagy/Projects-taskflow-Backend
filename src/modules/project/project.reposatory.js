@@ -6,17 +6,26 @@ export const createProject = async (data) => {
 };
 
 export const findProjectById = async (id) => {
-  return await Project.findById(id).populate("creator members", "userName email role");
+  return await Project.findById(id)
+    .populate("creator members", "userName email role")
+    .populate("totalTasks")
+    .populate("completedTasks");
 };
 
 export const findProjectsByUser = async (userId) => {
   return await Project.find({
     $or: [{ creator: userId }, { members: userId }]
-  }).populate("creator members", "userName email role");
+  })
+    .populate("creator members", "userName email role")
+    .populate("totalTasks")
+    .populate("completedTasks");
 };
 
 export const findAllProjects = async () => {
-  return await Project.find().populate("creator members", "userName email role");
+  return await Project.find()
+    .populate("creator members", "userName email role")
+    .populate("totalTasks")
+    .populate("completedTasks");
 };
 
 export const updateProject = async (id, data) => {

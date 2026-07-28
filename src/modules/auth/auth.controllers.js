@@ -51,6 +51,7 @@ export const signup = catchAsyncError(async (req, res, next) => {
       name: createdUser.userName,
       email: createdUser.email,
       role: createdUser.role,
+      timestamp: Date.now(),
     },
   });
 
@@ -94,6 +95,7 @@ export const logIn = catchAsyncError(async (req, res, next) => {
       name: userExist.userName,
       email: userExist.email,
       role: userExist.role,
+      timestamp: Date.now(),
     },
   });
   
@@ -122,4 +124,9 @@ export const logout = catchAsyncError(async (req, res, next) => {
     message: messages.user.loggedOutSuccessfully,
     success: true,
   });
+});
+
+export const getAllUsers = catchAsyncError(async (req, res, next) => {
+  const users = await authRepo.findAllUsers(req.authUser._id);
+  res.json({ success: true, data: users });
 });

@@ -1,4 +1,7 @@
 import { dbConnection } from "../../database/dbconnection.js";
+import dotenv from "dotenv";
+dotenv.config();
+
 import { AppError } from "../../utils/catch-error.js";
 import { globalError } from "../../utils/global-error.js";
 import * as allRouters from "./index.js";
@@ -7,7 +10,9 @@ export const bootstrap = (app) => {
     console.log("ERROR in code: ", err);
   });
 
-  dbConnection();
+  if (process.env.NODE_ENV !== "test") {
+    dbConnection();
+  }
 
   app.use("/auth", allRouters.authRouter);
   app.use("/projects", allRouters.projectRouter);

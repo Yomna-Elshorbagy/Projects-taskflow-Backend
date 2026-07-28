@@ -27,8 +27,25 @@ const projectSchema = new mongoose.Schema(
   {
     timestamps: true,
     versionKey: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
+
+projectSchema.virtual("totalTasks", {
+  ref: "Task",
+  localField: "_id",
+  foreignField: "project",
+  count: true,
+});
+
+projectSchema.virtual("completedTasks", {
+  ref: "Task",
+  localField: "_id",
+  foreignField: "project",
+  match: { status: "Done" },
+  count: true,
+});
 
 const Project = mongoose.model("Project", projectSchema);
 export default Project;

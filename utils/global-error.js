@@ -5,6 +5,6 @@ export const globalError = async (err, req, res, next) => {
     error: "Error: ",
     message: err.message,
     code,
-    sucess: false,
+    success: false,
   });
 };
