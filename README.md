@@ -20,6 +20,9 @@ The backend uses a standard Model-View-Controller (MVC) architecture adapted for
 
 ## 📡 API Endpoints Documentation
 
+> [!TIP]
+> **Interactive API Swagger Documentation**: The full interactive Swagger/OpenAPI documentation is available at `http://localhost:3000/taskflow-docs` when the server is running. You can test and inspect all endpoints directly from your browser.
+
 Below is a breakdown of the primary endpoints available for each model and what they do. Note that all endpoints (except signup and login) require a valid JWT token passed in the `authentication` header.
 
 ### Authentication & Users (`/auth`)
