@@ -33,4 +33,8 @@ export const getTasksVal = z.object({
   status: z.enum(Object.values(taskStatus)).optional(),
   priority: z.enum(Object.values(taskPriority)).optional(),
   assignee: generalFields.objectId.optional(),
+  page: z.string().optional(),
+  limit: z.string().optional(),
+  sort: z.string().optional(),
+  search: z.string().optional(),
 });

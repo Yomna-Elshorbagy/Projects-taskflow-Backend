@@ -1,4 +1,5 @@
 import Project from "../../../database/models/project.model.js";
+import { ApiFeatures } from "../../../utils/api-features.js";
 
 export const createProject = async (data) => {
   const project = new Project(data);
@@ -12,20 +13,46 @@ export const findProjectById = async (id) => {
     .populate("completedTasks");
 };
 
-export const findProjectsByUser = async (userId) => {
-  return await Project.find({
+export const findProjectsByUser = async (userId, queryData = {}) => {
+  const mongooseQuery = Project.find({
     $or: [{ creator: userId }, { members: userId }]
-  })
+  });
+
+  const features = new ApiFeatures(mongooseQuery, queryData)
+    .filter()
+    .search(["name", "description"])
+    .sort();
+
+  const totalItems = await Project.countDocuments(features.mongooseQuery.getFilter());
+
+  features.paginate();
+
+  const data = await features.mongooseQuery
     .populate("creator members", "userName email role")
     .populate("totalTasks")
     .populate("completedTasks");
+
+  return { data, totalItems };
 };
 
-export const findAllProjects = async () => {
-  return await Project.find()
+export const findAllProjects = async (queryData = {}) => {
+  const mongooseQuery = Project.find();
+  
+  const features = new ApiFeatures(mongooseQuery, queryData)
+    .filter()
+    .search(["name", "description"])
+    .sort();
+
+  const totalItems = await Project.countDocuments(features.mongooseQuery.getFilter());
+
+  features.paginate();
+
+  const data = await features.mongooseQuery
     .populate("creator members", "userName email role")
     .populate("totalTasks")
     .populate("completedTasks");
+
+  return { data, totalItems };
 };
 
 export const updateProject = async (id, data) => {

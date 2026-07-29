@@ -36,18 +36,26 @@ export const createTask = catchAsyncError(async (req, res, next) => {
 
 export const getTasks = catchAsyncError(async (req, res, next) => {
   const { projectId } = req.params;
-  const { status, priority, assignee } = req.query;
   
   const access = await checkProjectAccess(projectId, req.authUser._id, req.authUser.role);
   if (access.error) return next(access.error);
 
-  const filters = {};
-  if (status) filters.status = status;
-  if (priority) filters.priority = priority;
-  if (assignee) filters.assignee = assignee;
+  const { data, totalItems } = await taskRepo.findTasksByProject(projectId, req.query);
+  
+  const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+  const limit = Math.max(parseInt(req.query.limit, 10) || 10, 1);
+  const totalPages = Math.ceil(totalItems / limit);
 
-  const tasks = await taskRepo.findTasksByProject(projectId, filters);
-  res.json({ success: true, data: tasks });
+  res.json({
+    success: true,
+    data,
+    pagination: {
+      page,
+      limit,
+      totalItems,
+      totalPages,
+    },
+  });
 });
 
 export const getTaskById = catchAsyncError(async (req, res, next) => {

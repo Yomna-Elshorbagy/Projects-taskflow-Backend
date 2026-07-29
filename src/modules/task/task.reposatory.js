@@ -1,4 +1,5 @@
 import Task from "../../../database/models/task.model.js";
+import { ApiFeatures } from "../../../utils/api-features.js";
 
 export const createTask = async (data) => {
   const task = new Task(data);
@@ -11,11 +12,22 @@ export const findTaskById = async (id) => {
     .populate("statusHistory.changedBy", "userName email");
 };
 
-export const findTasksByProject = async (projectId, filters = {}) => {
-  return await Task.find({ project: projectId, ...filters })
+export const findTasksByProject = async (projectId, queryData = {}) => {
+  const mongooseQuery = Task.find({ project: projectId });
+  const features = new ApiFeatures(mongooseQuery, queryData)
+    .filter()
+    .search(["title", "description"])
+    .sort();
+
+  const totalItems = await Task.countDocuments(features.mongooseQuery.getFilter());
+
+  features.paginate();
+
+  const data = await features.mongooseQuery
     .populate("creator assignee", "userName email role")
-    .populate("statusHistory.changedBy", "userName email")
-    .sort({ createdAt: -1 });
+    .populate("statusHistory.changedBy", "userName email");
+
+  return { data, totalItems };
 };
 
 export const updateTask = async (id, data) => {

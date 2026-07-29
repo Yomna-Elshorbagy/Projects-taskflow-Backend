@@ -15,13 +15,28 @@ export const createProject = catchAsyncError(async (req, res, next) => {
 });
 
 export const getProjects = catchAsyncError(async (req, res, next) => {
-  let projects;
+  let result;
   if (req.authUser.role === roles.ADMIN) {
-    projects = await projectRepo.findAllProjects();
+    result = await projectRepo.findAllProjects(req.query);
   } else {
-    projects = await projectRepo.findProjectsByUser(req.authUser._id);
+    result = await projectRepo.findProjectsByUser(req.authUser._id, req.query);
   }
-  res.json({ success: true, data: projects });
+
+  const { data, totalItems } = result;
+  const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+  const limit = Math.max(parseInt(req.query.limit, 10) || 10, 1);
+  const totalPages = Math.ceil(totalItems / limit);
+
+  res.json({
+    success: true,
+    data,
+    pagination: {
+      page,
+      limit,
+      totalItems,
+      totalPages,
+    },
+  });
 });
 
 export const getProjectById = catchAsyncError(async (req, res, next) => {
