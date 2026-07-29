@@ -113,6 +113,8 @@ TOKEN_PRIFEX2=Bearer__
 
 ## 💻 Installation & Setup
 
+### Local Setup (Standard)
+
 1. **Clone the repository and navigate to the backend folder:**
    ```bash
    cd "Project Name"
@@ -128,6 +130,23 @@ TOKEN_PRIFEX2=Bearer__
    npm run dev
    ```
    The server should start on `http://localhost:3000` (or whatever `PORT` you configured).
+
+### 🐳 Local Setup (Docker Compose - Recommended)
+
+To run the application and a dedicated MongoDB database instance locally with high performance, isolated environments, and zero installation requirements on your host machine (except Docker):
+
+1. **Ensure you have Docker & Docker Compose installed.**
+2. **Configure your `.env` file** in the root directory. (Docker Compose automatically merges your environment configurations from `.env` and redirects database traffic internally to the containerized MongoDB service).
+3. **Build and start the containers:**
+   ```bash
+   docker compose up --build -d
+   ```
+4. **Access the application**: The API will be available at `http://localhost:3000`. You can also connect to the local MongoDB database using Compass/shell at `mongodb://localhost:27017/taskflow`.
+5. **Stop the containers:**
+   ```bash
+   docker compose down
+   ```
+
 
 ## 🧪 Testing
 

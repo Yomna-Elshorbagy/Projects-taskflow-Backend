@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # MongoDB service with data persistence and automated health checks
+  mongodb:
+    image: mongo:6.0
+    container_name: taskflow-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.runCommand({ping: 1})"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - taskflow-network
+
+  # Node.js backend application service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taskflow-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      # Redirect database connection to the containerized MongoDB service
+      - MONGODB_ATLAS=mongodb://mongodb:27017/taskflow
+      - port=3000
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - taskflow-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  taskflow-network:
+    driver: bridge
