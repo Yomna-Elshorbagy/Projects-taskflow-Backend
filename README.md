@@ -39,6 +39,47 @@ Below is a breakdown of the primary endpoints available for each model and what 
 - **`GET /projects/:projectId/tasks/:taskId`**: Fetches details for a specific task.
 - **`PUT /projects/:projectId/tasks/:taskId`**: Updates a task (e.g., changing its status from 'To Do' to 'In Progress'). *If the status is changed, this method automatically logs the change into the `statusHistory` array.*
 - **`DELETE /projects/:projectId/tasks/:taskId`**: Deletes a specific task. *Only the task creator or an Admin can perform this action.*
+
+## 🔍 Pagination, Sorting, Search & Filtering (ApiFeatures)
+
+Both `/projects` and `/projects/:projectId/tasks` endpoints support advanced querying using our custom `ApiFeatures` engine.
+
+### 1. Pagination
+To paginate results, supply `page` and `limit` as query parameters. By default, if they are omitted, the API returns **all items**.
+- **`page`** (optional): The current page number (starts at `1`).
+- **`limit`** (optional): The number of items to return per page.
+
+**Example Response Metadata:**
+When pagination parameters are present (or default values apply), the API includes a `pagination` object:
+```json
+{
+  "success": true,
+  "data": [...],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "totalItems": 25,
+    "totalPages": 3
+  }
+}
+```
+
+### 2. Sorting
+Sort items by specifying the `sort` query parameter. Supply field names comma-separated. Prefix a field name with `-` for descending order.
+- **Example**: `GET /projects/:projectId/tasks?sort=dueDate,-createdAt` (sorts by due date ascending, and then by creation date descending).
+- **Default Sort**: If not specified, results default to `-createdAt` (newest first).
+
+### 3. Searching
+Search items dynamically using a case-insensitive regex search by passing the `search` query parameter.
+- **Projects**: Searches across the `name` and `description` fields.
+  - **Example**: `GET /projects?search=marketing`
+- **Tasks**: Searches across the `title` and `description` fields.
+  - **Example**: `GET /projects/:projectId/tasks?search=database`
+
+### 4. General Filtering
+Any key-value pair passed in the query string that is not a reserved keyword (`page`, `limit`, `sort`, `search`) is treated as an exact match filter.
+- **Example**: `GET /projects/:projectId/tasks?status=In Progress&priority=High` (returns only tasks with "In Progress" status and "High" priority).
+
 ## 📋 Prerequisites
 
 - **Node.js** (v18 or higher recommended)
