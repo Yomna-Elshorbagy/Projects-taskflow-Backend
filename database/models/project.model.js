@@ -47,5 +47,8 @@ projectSchema.virtual("completedTasks", {
   count: true,
 });
 
+projectSchema.index({ creator: 1 });
+projectSchema.index({ members: 1 });
+
 const Project = mongoose.model("Project", projectSchema);
 export default Project;
