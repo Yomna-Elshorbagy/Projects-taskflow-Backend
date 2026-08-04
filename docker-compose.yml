@@ -19,6 +19,16 @@ services:
     networks:
       - taskflow-network
 
+  # Redis caching service
+  redis:
+    image: redis:7-alpine
+    container_name: taskflow-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - taskflow-network
+
   # Node.js backend application service
   app:
     build:
@@ -33,10 +43,13 @@ services:
     environment:
       # Redirect database connection to the containerized MongoDB service
       - MONGODB_ATLAS=mongodb://mongodb:27017/taskflow
+      - REDIS_URL=redis://redis:6379
       - port=3000
     depends_on:
       mongodb:
         condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - taskflow-network
 

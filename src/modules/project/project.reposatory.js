@@ -1,5 +1,6 @@
 import Project from "../../../database/models/project.model.js";
 import { ApiFeatures } from "../../../utils/api-features.js";
+import redisService from "../../services/redis.service.js";
 
 export const createProject = async (data) => {
   const project = new Project(data);
@@ -7,10 +8,19 @@ export const createProject = async (data) => {
 };
 
 export const findProjectById = async (id) => {
-  return await Project.findById(id)
+  const cacheKey = `project:${id}`;
+  const cachedProject = await redisService.get(cacheKey);
+  if (cachedProject) return cachedProject;
+
+  const project = await Project.findById(id)
     .populate("creator members", "userName email role")
     .populate("totalTasks")
     .populate("completedTasks");
+
+  if (project) {
+    await redisService.set(cacheKey, project, 3600);
+  }
+  return project;
 };
 
 export const findProjectsByUser = async (userId, queryData = {}) => {
@@ -56,25 +66,32 @@ export const findAllProjects = async (queryData = {}) => {
 };
 
 export const updateProject = async (id, data) => {
-  return await Project.findByIdAndUpdate(id, data, { new: true }).populate("creator members", "userName email role");
+  const project = await Project.findByIdAndUpdate(id, data, { new: true }).populate("creator members", "userName email role");
+  await redisService.del(`project:${id}`);
+  return project;
 };
 
 export const deleteProject = async (id) => {
+  await redisService.del(`project:${id}`);
   return await Project.findByIdAndDelete(id);
 };
 
 export const addMember = async (projectId, userId) => {
-  return await Project.findByIdAndUpdate(
+  const project = await Project.findByIdAndUpdate(
     projectId,
     { $addToSet: { members: userId } },
     { new: true }
   ).populate("creator members", "userName email role");
+  await redisService.del(`project:${projectId}`);
+  return project;
 };
 
 export const removeMember = async (projectId, userId) => {
-  return await Project.findByIdAndUpdate(
+  const project = await Project.findByIdAndUpdate(
     projectId,
     { $pull: { members: userId } },
     { new: true }
   ).populate("creator members", "userName email role");
+  await redisService.del(`project:${projectId}`);
+  return project;
 };
