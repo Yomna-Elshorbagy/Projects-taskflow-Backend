@@ -7,7 +7,8 @@ A robust Express.js and MongoDB-based RESTful API that powers the TaskFlow proje
 The backend uses a standard Model-View-Controller (MVC) architecture adapted for an API (Model-Route-Controller-Repository). 
 
 - **Framework**: Node.js with Express.js
-- **Database**: MongoDB with Mongoose ODM
+- **Database**: MongoDB with Mongoose ODM (Optimized with single & compound ESR indexes)
+- **Caching**: Redis (Cache-aside pattern with graceful fallback)
 - **Authentication**: JWT (JSON Web Tokens) with secure token invalidation tracking and hashing password.
 - **Validation**: Zod for strict request payload validation.
 - **Testing**: Jest and Supertest for API endpoint and unit testing.
@@ -87,6 +88,7 @@ Any key-value pair passed in the query string that is not a reserved keyword (`p
 
 - **Node.js** (v18 or higher recommended)
 - **MongoDB** (Local instance or MongoDB Atlas cluster)
+- **Redis** (Local instance or Upstash cluster. *Not required if using Docker*)
 - **npm** or **yarn**
 
 ## 🛠️ Environment Variables Setup
@@ -94,22 +96,31 @@ Any key-value pair passed in the query string that is not a reserved keyword (`p
 Create a `.env` file in the root directory of the backend project. The application requires the following environment variables to run successfully:
 
 ```env
-# Application Port
-PORT=3000
-APPLICATION_NAME=TaskFlow
+# Application Settings
+port=3000
+APPLICATION_NAME='TaskFlow App'
 
-# Database Connection
-MONGODB_ATLAS=mongodb+srv://<username>:<password>@cluster0.mongodb.net/taskflow?retryWrites=true&w=majority
+# Database & Cache Connections
+MONGODB_ATLAS='mongodb+srv://<username>:<password>@cluster0.mongodb.net/taskflow?retryWrites=true&w=majority'
+REDIS_URL='redis://localhost:6379'
+
+# Cloudinary (Default Avatar Images)
+SECURE_URL='https://res.cloudinary.com/...'
+PUBLIC_ID='profile-image_id'
 
 # JWT Authentication Secrets
-SECRET_KEY=your_super_secret_jwt_key
-EMAIL_KEY=your_email_verification_secret
-SECRETKEYRESETPASS=your_password_reset_secret
+SECRET_KEY='your_super_secret_jwt_key'
+EMAIL_KEY='your_email_verification_secret'
+SECRETKEYRESETPASS='your_password_reset_secret'
 
-# Token Prefixes (Required for Auth Middleware)
-# Example values you can use:
-TOKEN_PRIFEX1=reset__
-TOKEN_PRIFEX2=Bearer__
+# Email Config (Nodemailer) for further updates 
+SENDEMAIL='your_email@gmail.com'
+SENDEMAILPASSWORD='your_app_password'
+
+# Auth Config
+TOKEN_PRIFEX1="reset-password"
+TOKEN_PRIFEX2="bearer"
+SALT_ROUNDS=8
 ```
 
 *(Note: Never commit your `.env` file to version control. If deploying to Vercel, add these exact keys to your project's Environment Variables settings).*
@@ -136,10 +147,10 @@ TOKEN_PRIFEX2=Bearer__
 
 ### 🐳 Local Setup (Docker Compose - Recommended)
 
-To run the application and a dedicated MongoDB database instance locally with high performance, isolated environments, and zero installation requirements on your host machine (except Docker):
+To run the application alongside a dedicated MongoDB database instance and a Redis caching server locally with high performance, isolated environments, and zero installation requirements on your host machine (except Docker):
 
 1. **Ensure you have Docker & Docker Compose installed.**
-2. **Configure your `.env` file** in the root directory. (Docker Compose automatically merges your environment configurations from `.env` and redirects database traffic internally to the containerized MongoDB service).
+2. **Configure your `.env` file** in the root directory. (Docker Compose automatically merges your environment configurations from `.env` and redirects database/cache traffic internally to the containerized services).
 3. **Build and start the containers:**
    ```bash
    docker compose up --build -d
