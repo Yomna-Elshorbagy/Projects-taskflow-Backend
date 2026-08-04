@@ -8,7 +8,7 @@ import { AppError, catchAsyncError } from "../../utils/catch-error.js";
 export const isAuthenticated = catchAsyncError(async (req, res, next) => {
   const { authentication } = req.headers;
   let result = "";
-  if (!authentication) return next(new AppError("please signIn first", 401));
+  if (!authentication) return next(new AppError(messages.user.signInRequired, 401));
   let [key, token] = authentication.split(" ");
   const validPrefixes = [
     process.env.TOKEN_PRIFEX1,

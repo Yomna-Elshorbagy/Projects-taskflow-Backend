@@ -28,6 +28,8 @@ export const messages = {
     expireOTP: "OTP expired",
     invalidOTP: "Invalid OTP",
     loggedOutSuccessfully: "logged Out Successfully",
+    signInRequired: "please signIn first",
+    passwordMismatch: "password and confirmed password doesn't Match",
   },
   password: generateMessage("password"),
   file: { required: "file is required" },

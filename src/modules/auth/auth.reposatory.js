@@ -21,6 +21,10 @@ export const updateUserByEmail = async (email, updateData) => {
   return await User.findOneAndUpdate({ email }, updateData, { new: true });
 };
 
+export const updateUserById = async (id, updateData) => {
+  return await User.findByIdAndUpdate(id, updateData, { new: true }).select("-password");
+};
+
 export const createToken = async (tokenData) => {
   return await Token.create(tokenData);
 };

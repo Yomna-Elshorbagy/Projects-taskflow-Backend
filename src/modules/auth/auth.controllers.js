@@ -17,7 +17,7 @@ export const signup = catchAsyncError(async (req, res, next) => {
   } = req.body;
 
   if (password !== Cpassword) {
-    return next(new AppError("password and confirmed password doesn't Match", 401));
+    return next(new AppError(messages.user.passwordMismatch, 401));
   }
 
   const userExisting = await authRepo.findUserByEmailOrMobile(email, mobileNumber);
@@ -115,7 +115,7 @@ export const logIn = catchAsyncError(async (req, res, next) => {
 
 export const logout = catchAsyncError(async (req, res, next) => {
   const { authentication } = req.headers;
-  if (!authentication) return next(new AppError("please signIn first", 401));
+  if (!authentication) return next(new AppError(messages.user.signInRequired, 401));
   let [key, token] = authentication.split(" ");
   
   await authRepo.invalidateToken(token, req.authUser._id);
@@ -129,4 +129,25 @@ export const logout = catchAsyncError(async (req, res, next) => {
 export const getAllUsers = catchAsyncError(async (req, res, next) => {
   const users = await authRepo.findAllUsers(req.authUser._id);
   res.json({ success: true, data: users });
+});
+
+export const getProfile = catchAsyncError(async (req, res, next) => {
+  res.status(200).json({
+    success: true,
+    data: req.authUser,
+  });
+});
+
+export const updateProfile = catchAsyncError(async (req, res, next) => {
+  const updatedUser = await authRepo.updateUserById(req.authUser._id, req.body);
+  
+  if (!updatedUser) {
+    return next(new AppError(messages.user.failToUpdate, 500));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Profile updated successfully",
+    data: updatedUser,
+  });
 });

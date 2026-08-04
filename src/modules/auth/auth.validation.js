@@ -23,3 +23,11 @@ export const logInVal = z.object({
   message: "Either email or mobile number must be provided",
   path: ["email"],
 });
+
+export const updateProfileVal = z.object({
+  userName: generalFields.name.optional(),
+  mobileNumber: generalFields.mobileNumber.optional(),
+  address: z.string().optional(),
+  gender: z.enum(Object.values(gender)).optional(),
+});
+
