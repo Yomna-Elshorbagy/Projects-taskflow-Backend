@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --runInBand --detectOpenHandles"
+    "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --runInBand --detectOpenHandles",
+    "seed": "node database/seed.js"
   },
+
   "keywords": [],
   "author": "",
   "license": "ISC",
