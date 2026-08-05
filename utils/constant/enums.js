@@ -21,6 +21,8 @@ Object.freeze(status);
 export const taskStatus = {
   TODO: "To Do",
   IN_PROGRESS: "In Progress",
+  READY_FOR_TEST: "Ready for test",
+  APPROVED: "Approved",
   DONE: "Done",
 };
 Object.freeze(taskStatus);
