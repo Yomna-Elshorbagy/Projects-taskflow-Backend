@@ -6,11 +6,17 @@ import { createClient } from "redis";
  */
 class RedisService {
   constructor() {
+    this.isConnected = false;
+
+    // ==> Bypass Redis connection in testing environment to prevent errors
+    if (process.env.NODE_ENV === "test") {
+      return;
+    }
+
     this.client = createClient({
       url: process.env.REDIS_URL || "redis://localhost:6379",
     });
 
-    this.isConnected = false;
 
     this.client.on("error", (err) => {
       console.error("Redis Client Error", err);

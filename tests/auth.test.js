@@ -59,4 +59,19 @@ describe("Auth Endpoints", () => {
 
     expect(res.statusCode).toEqual(401);
   });
+  it("should fail validation with an invalid email format", async () => {
+    const invalidUser = { ...testUser, email: "invalid-email" };
+    const res = await request(app).post("/auth/signup").send(invalidUser);
+    
+    // Expect 400 Bad Request or validation error status
+    expect(res.statusCode).toEqual(400);
+  });
+
+  it("should fail validation when required fields are missing", async () => {
+    const invalidUser = { ...testUser };
+    delete invalidUser.password;
+    const res = await request(app).post("/auth/signup").send(invalidUser);
+    
+    expect(res.statusCode).toEqual(400);
+  });
 });

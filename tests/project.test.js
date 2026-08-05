@@ -103,4 +103,45 @@ describe("Project Endpoints", () => {
 
     expect(res.statusCode).toEqual(404);
   });
+  it("should fail to create a project if no authentication token is provided", async () => {
+    const res = await request(app)
+      .post("/projects")
+      .send({
+        name: "Unauthorized Project",
+        description: "This should fail due to lack of auth token.",
+      });
+
+    // Expect 401 Unauthorized or similar error status for missing token
+    expect([400, 401, 403]).toContain(res.statusCode); // Allow any error depending on implementation
+  });
+
+  it("should fail to add a member to a project for a regular user (not admin)", async () => {
+    // Generate regular user token
+    const loginRes = await request(app).post("/auth/login").send({
+      email: "user@example.com",
+      password: "Password123",
+    });
+    const userToken = process.env.TOKEN_PRIFEX2 + " " + loginRes.body.accessToken;
+
+    // Create project as admin first
+    const projectRes = await request(app)
+      .post("/projects")
+      .set("authentication", adminToken)
+      .send({
+        name: "Admin Project",
+        description: "This is a strictly over 20 characters description for the project.",
+      });
+    const projectId = projectRes.body.data._id;
+
+    // Regular user attempts to add a member
+    const res = await request(app)
+      .post(`/projects/${projectId}/members`)
+      .set("authentication", userToken)
+      .send({
+        userId: adminUserId, // Just trying to add someone
+      });
+
+    // Expect forbidden status because user is not admin
+    expect([401, 403]).toContain(res.statusCode);
+  });
 });
