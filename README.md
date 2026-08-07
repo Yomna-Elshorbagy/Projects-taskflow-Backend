@@ -232,17 +232,26 @@ node database/seed.js --wipe
 
 ## 🧪 Testing
 
-This project uses **Jest** alongside **Supertest** to execute endpoint tests on an isolated test database.
+This project uses **Jest** alongside **Supertest** and **MongoMemoryServer** to execute robust unit and end-to-end integration tests on an isolated, in-memory test database.
 
-**To run the test suite:**
+### Test Commands:
+You have total control over which test suites to run:
+
 ```bash
+# Run ALL tests (Unit + Integration)
 npm run test
+
+# Run ONLY Unit tests
+npm run test:unit
+
+# Run ONLY End-to-End Integration tests
+npm run test:integration
 ```
 
-This will run tests across:
-- **Auth Endpoints** (Registration, Login, Validations)
-- **Project Endpoints** (Creation, Member Management)
-- **Task Endpoints** (Creation, Fetching, Status Update Audit Logs)
+**Integration Tests Cover:**
+- **Auth Endpoints**: Registration, Login, Profile updates, and JWT Token assignments.
+- **Project Endpoints**: Project Creation, and strictly testing Admin-only Member Management (RBAC).
+- **Task Endpoints**: Task Creation, Fetching, Status Update Audit Logs, and proper Deletion authorization.
 
 ## 🚢 Deployment (Vercel)
 
