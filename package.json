@@ -6,7 +6,11 @@
   "scripts": {
     "start": "node index.js",
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --runInBand --detectOpenHandles",
-    "seed": "node database/seed.js"
+    "seed": "node database/seed.js",
+    "migrate:up": "migrate-mongo up",
+    "migrate:down": "migrate-mongo down",
+    "migrate:create": "migrate-mongo create",
+    "migrate:status": "migrate-mongo status"
   },
 
   "keywords": [],
@@ -20,6 +24,7 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "migrate-mongo": "^14.0.7",
     "mongoose": "^9.8.0",
     "multer": "^2.2.0",
     "nodemailer": "^9.0.3",
