@@ -19,6 +19,23 @@ The backend uses a standard Model-View-Controller (MVC) architecture adapted for
 3. **Task Module**: Manages tasks assigned to projects. Tracks statuses, priorities, due dates, and assignees.
 4. **Audit Logging**: Automatically maintains an immutable `statusHistory` on tasks to track when statuses change and who changed them.
 
+## 📂 Project Structure
+
+```text
+├── database/
+│   ├── models/            # Mongoose schemas (User, Task, Project, Token)
+│   ├── dbconnection.js    # MongoDB connection logic
+│   └── seed.js            # Idempotent database seeding script
+├── migrations/            # migrate-mongo scripts for schema/data evolution
+├── src/
+│   └── modules/           # Feature modules (Auth, Project, Task) containing Routes & Controllers
+├── tests/                 # Jest & Supertest API integration tests
+├── utils/                 # Helpers, enums, global error handlers, token utils
+├── index.js               # Application entry point & Express setup
+├── migrate-mongo-config.js# Configuration for database migrations
+└── package.json           # Dependencies and NPM scripts
+```
+
 ## 📡 API Endpoints Documentation
 
 > [!TIP]
@@ -31,11 +48,17 @@ Below is a breakdown of the primary endpoints available for each model and what 
 - **`POST /auth/login`**: Authenticates a user. Returns a JWT access token if the credentials are valid.
 - **`POST /auth/logout`**: Logs out the user by finding their active session token in the database and marking it as invalid/expired.
 - **`GET /auth/users`**: Fetches a list of registered users (used in the frontend to populate the assignee dropdowns).
+- **`GET /auth/profile`**: Fetches the authenticated user's profile details.
+- **`PUT /auth/profile`**: Updates the authenticated user's profile.
 
 ### Projects (`/projects`)
 - **`POST /projects`**: Creates a new project and assigns the requesting user as the `creator`.
-- **`POST /projects/:projectId/members`**: Adds an existing user as a member to the project. *Only the project creator or an Admin can perform this action.*
-- **`GET /projects`**: (If implemented) Retrieves all projects that the user has access to (either as a creator, a member, or an admin).
+- **`GET /projects`**: Retrieves all projects that the user has access to (either as a creator, a member, or an admin).
+- **`GET /projects/:id`**: Fetches details for a specific project.
+- **`PUT /projects/:id`**: Updates project details. *Only the project creator or an Admin can perform this action.*
+- **`DELETE /projects/:id`**: Deletes a specific project. *Only an Admin can perform this action.*
+- **`POST /projects/:id/members`**: Adds an existing user as a member to the project. *Only an Admin can perform this action.*
+- **`DELETE /projects/:id/members/:userId`**: Removes a member from the project. *Only an Admin can perform this action.*
 
 ### Tasks (`/projects/:projectId/tasks`)
 - **`POST /projects/:projectId/tasks`**: Creates a new task within a specific project. Requires title, description, due date, and an assignee.
@@ -139,10 +162,16 @@ SALT_ROUNDS=8
    npm install
    ```
 
-3. **Start the development server:**
-   ```bash
-   npm run dev
-   ```
+3. **Start the server:**
+   
+   - **Standard Mode**:
+     ```bash
+     npm start
+     ```
+   - **Development Mode** (Auto-restarts when files change using `nodemon`):
+     ```bash
+     npx nodemon index.js  or nodemon 
+     ```
    The server should start on `http://localhost:3000` (or whatever `PORT` you configured).
 
 ### 🐳 Local Setup (Docker Compose - Recommended)
@@ -161,6 +190,45 @@ To run the application alongside a dedicated MongoDB database instance and a Red
    docker compose down
    ```
 
+
+## 🗄️ Database Migrations
+
+Because MongoDB is schema-less, we use **`migrate-mongo`** to handle database state evolution, index creation, and data backfilling in a safe, repeatable way.
+
+### Why `migrate-mongo` is the Best Choice:
+- **Cloud Scaling Safety**: Running migrations as a decoupled CI/CD CLI step prevents race conditions when multiple server instances (e.g. Docker containers) boot simultaneously.
+- **State Tracking**: Automatically tracks which migrations have run in a `changelog` collection.
+- **Atomic Operations**: Prevents parallel execution and data corruption.
+
+### Migration Commands:
+```bash
+# Apply pending migrations
+npm run migrate:up
+
+# Rollback the last migration
+npm run migrate:down
+
+# Create a new timestamped migration script
+npm run migrate:create <name>
+
+# Check migration execution status
+npm run migrate:status
+```
+
+## 🌱 Database Seeding
+
+Database seeding populates the database with an initial, predictable dataset. This is essential for instant developer onboarding and consistent QA testing environments.
+
+### How to Run:
+Our seeder is built with **Idempotency** (using `upsert`), meaning it safely updates data without duplicating it if run multiple times.
+
+```bash
+# Standard Run (Safely adds missing default users and projects)
+npm run seed
+
+# Wipe Run (Completely erases the database and starts fresh)
+node database/seed.js --wipe
+```
 
 ## 🧪 Testing
 
