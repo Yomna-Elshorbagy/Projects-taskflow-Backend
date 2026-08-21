@@ -35,6 +35,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: taskflow-backend
+    command: sh -c "npm run migrate:up && npm start"
     restart: unless-stopped
     ports:
       - "3000:3000"

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
+    "start:all": "docker-compose up -d redis mongodb && npm run start",
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --runInBand --detectOpenHandles",
     "test:unit": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest tests/unit --runInBand",
     "test:integration": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest tests/integration.test.js --runInBand --detectOpenHandles",

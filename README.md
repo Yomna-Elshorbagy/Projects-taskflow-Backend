@@ -28,7 +28,14 @@ The backend uses a standard Model-View-Controller (MVC) architecture adapted for
 │   └── seed.js            # Idempotent database seeding script
 ├── migrations/            # migrate-mongo scripts for schema/data evolution
 ├── src/
-│   └── modules/           # Feature modules (Auth, Project, Task) containing Routes & Controllers
+│   ├── modules/           # Feature modules (Auth, Project, Task)
+│   │   ├── auth/          # Example of a typical module structure
+│   │   │   ├── auth.controllers.js  # Request handlers and business logic
+│   │   │   ├── auth.reposatory.js   # Database abstraction layer
+│   │   │   ├── auth.router.js       # Express route definitions
+│   │   │   └── auth.validation.js   # Zod schema validations
+│   │   └── ...            # Other modules follow the same pattern
+│   └── services/          # Core services (e.g., redis.service.js for caching)
 ├── tests/                 # Jest & Supertest API integration tests
 ├── utils/                 # Helpers, enums, global error handlers, token utils
 ├── index.js               # Application entry point & Express setup
@@ -162,16 +169,20 @@ SALT_ROUNDS=8
    npm install
    ```
 
-3. **Start the server:**
-   
-   - **Standard Mode**:
-     ```bash
-     npm start
-     ```
-   - **Development Mode** (Auto-restarts when files change using `nodemon`):
-     ```bash
-     npx nodemon index.js  or nodemon 
-     ```
+   3. **Start the server:**
+      
+      - **Standard Mode**:
+        ```bash
+        npm start
+        ```
+      - **All-in-One Mode** (Starts Redis & MongoDB via Docker, then starts the Node server):
+        ```bash
+        npm run start:all
+        ```
+      - **Development Mode** (Auto-restarts when files change using `nodemon`):
+        ```bash
+        npx nodemon index.js  or nodemon 
+        ```
    The server should start on `http://localhost:3000` (or whatever `PORT` you configured).
 
 ### 🐳 Local Setup (Docker Compose - Recommended)
@@ -188,6 +199,10 @@ To run the application alongside a dedicated MongoDB database instance and a Red
 5. **Stop the containers:**
    ```bash
    docker compose down
+   ```
+   *(Optional) To completely clean up and free disk space by removing the cached Docker images along with the containers, run:*
+   ```bash
+   docker compose down --rmi all
    ```
 
 
