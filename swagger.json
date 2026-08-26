@@ -114,6 +114,47 @@
             }
           }
         }
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "task": {
+            "type": "string"
+          },
+          "project": {
+            "type": "string"
+          },
+          "sender": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string"
+              },
+              "userName": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "image": {
+                "type": "object"
+              }
+            }
+          },
+          "content": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
       }
     }
   },
@@ -818,6 +859,32 @@
         "responses": {
           "200": {
             "description": "Task deleted successfully"
+          }
+        }
+      }
+    },
+    "/socket": {
+      "get": {
+        "tags": ["WebSockets"],
+        "summary": "WebSocket Connection Protocol (Socket.io)",
+        "description": "Establish a WebSocket connection using Socket.io client for real-time task group chat. Requires authorization token in handshake auth object.",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "description": "JWT Authorization token passed in handshake `auth.token` parameter",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "Successfully upgraded to WebSocket protocol. Supports events: `join_task`, `send_message`, `typing`, `stop_typing`"
+          },
+          "401": {
+            "description": "Unauthorized connection"
           }
         }
       }

@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
+import { createServer } from "http";
 import { bootstrap } from "./src/modules/bootstrap.js";
+import appGateway from "./src/socket/app.gateway.js";
 
 const app = express();
 
@@ -16,8 +18,13 @@ app.get("/", (req, res) => {
 });
 
 bootstrap(app);
+
+const httpServer = createServer(app);
+
 if (process.env.NODE_ENV !== "test") {
-  app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+  appGateway.init(httpServer).then(() => {
+    httpServer.listen(port, () => console.log(`Example app listening on port ${port} with WebSockets enabled!`));
+  });
 }
 
 export default app;

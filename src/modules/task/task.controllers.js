@@ -1,4 +1,4 @@
-import * as taskRepo from "./task.reposatory.js";
+﻿import * as taskRepo from "./task.reposatory.js";
 import * as projectRepo from "../project/project.reposatory.js";
 import { AppError, catchAsyncError } from "../../../utils/catch-error.js";
 import { roles } from "../../../utils/constant/enums.js";
@@ -21,7 +21,7 @@ const checkProjectAccess = async (projectId, userId, role) => {
 
 export const createTask = catchAsyncError(async (req, res, next) => {
   const { projectId } = req.params;
-  
+
   const access = await checkProjectAccess(projectId, req.authUser._id, req.authUser.role);
   if (access.error) return next(access.error);
 
@@ -36,12 +36,12 @@ export const createTask = catchAsyncError(async (req, res, next) => {
 
 export const getTasks = catchAsyncError(async (req, res, next) => {
   const { projectId } = req.params;
-  
+
   const access = await checkProjectAccess(projectId, req.authUser._id, req.authUser.role);
   if (access.error) return next(access.error);
 
   const { data, totalItems } = await taskRepo.findTasksByProject(projectId, req.query);
-  
+
   const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
   const limit = Math.max(parseInt(req.query.limit, 10) || 10, 1);
   const totalPages = Math.ceil(totalItems / limit);
@@ -60,7 +60,7 @@ export const getTasks = catchAsyncError(async (req, res, next) => {
 
 export const getTaskById = catchAsyncError(async (req, res, next) => {
   const { projectId, taskId } = req.params;
-  
+
   const access = await checkProjectAccess(projectId, req.authUser._id, req.authUser.role);
   if (access.error) return next(access.error);
 
@@ -74,7 +74,7 @@ export const getTaskById = catchAsyncError(async (req, res, next) => {
 
 export const updateTask = catchAsyncError(async (req, res, next) => {
   const { projectId, taskId } = req.params;
-  
+
   const access = await checkProjectAccess(projectId, req.authUser._id, req.authUser.role);
   if (access.error) return next(access.error);
 
@@ -85,7 +85,8 @@ export const updateTask = catchAsyncError(async (req, res, next) => {
 
   // Admin, Project Creator, or Task Creator can update
   const isTaskCreator = task.creator._id.toString() === req.authUser._id.toString();
-  if (!access.isAdmin && !access.isCreator && !isTaskCreator) {
+  const isAssignee = task.assignee?._id?.toString() === req.authUser._id.toString();
+  if (!access.isAdmin && !access.isCreator && !isTaskCreator && !isAssignee) {
     return next(new AppError(messages.user.notAuthorized, 403));
   }
 
@@ -106,7 +107,7 @@ export const updateTask = catchAsyncError(async (req, res, next) => {
 
 export const deleteTask = catchAsyncError(async (req, res, next) => {
   const { projectId, taskId } = req.params;
-  
+
   const access = await checkProjectAccess(projectId, req.authUser._id, req.authUser.role);
   if (access.error) return next(access.error);
 
