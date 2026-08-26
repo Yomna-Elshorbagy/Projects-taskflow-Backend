@@ -17,7 +17,8 @@ The backend uses a standard Model-View-Controller (MVC) architecture adapted for
 1. **Auth Module**: Handles user registration, secure login, password hashing (bcryptjs), and session/token tracking. 
 2. **Project Module**: Allows authorized users to create projects, invite members, and manage project details. Access controls ensure only creators or admins can manage members.
 3. **Task Module**: Manages tasks assigned to projects. Tracks statuses, priorities, due dates, and assignees.
-4. **Audit Logging**: Automatically maintains an immutable `statusHistory` on tasks to track when statuses change and who changed them.
+4. **Chat Module (WebSockets)**: Handles real-time communication within tasks using Socket.io. Validates JWT tokens during handshake and broadcasts typing events and chat messages to rooms specific to each task.
+5. **Audit Logging**: Automatically maintains an immutable `statusHistory` on tasks to track when statuses change and who changed them.
 
 ## 📂 Project Structure
 
@@ -267,6 +268,7 @@ npm run test:integration
 - **Auth Endpoints**: Registration, Login, Profile updates, and JWT Token assignments.
 - **Project Endpoints**: Project Creation, and strictly testing Admin-only Member Management (RBAC).
 - **Task Endpoints**: Task Creation, Fetching, Status Update Audit Logs, and proper Deletion authorization.
+- **WebSocket Chat**: Socket.io token authentication, real-time message broadcasting, and typing events.
 
 ## 🚢 Deployment (Vercel)
 
