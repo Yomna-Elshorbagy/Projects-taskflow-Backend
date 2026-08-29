@@ -1,4 +1,4 @@
-{
+export default {
   "openapi": "3.0.0",
   "info": {
     "title": "TaskFlow Backend API",
@@ -6,6 +6,10 @@
     "version": "1.0.0"
   },
   "servers": [
+    {
+      "url": process.env.API_BASE_URL,
+      "description": "Live Production Server"
+    },
     {
       "url": "http://localhost:3000",
       "description": "Local Development Server"
@@ -76,11 +80,19 @@
           },
           "status": {
             "type": "string",
-            "enum": ["To Do", "In Progress", "Done"]
+            "enum": [
+              "To Do",
+              "In Progress",
+              "Done"
+            ]
           },
           "priority": {
             "type": "string",
-            "enum": ["Low", "Medium", "High"]
+            "enum": [
+              "Low",
+              "Medium",
+              "High"
+            ]
           },
           "dueDate": {
             "type": "string",
@@ -161,7 +173,9 @@
   "paths": {
     "/auth/signup": {
       "post": {
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "summary": "Register a new user",
         "requestBody": {
           "required": true,
@@ -169,9 +183,16 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["username", "email", "password"],
+                "required": [
+                  "userName",
+                  "email",
+                  "password",
+                  "Cpassword",
+                  "gender",
+                  "mobileNumber"
+                ],
                 "properties": {
-                  "username": {
+                  "userName": {
                     "type": "string"
                   },
                   "email": {
@@ -179,25 +200,55 @@
                   },
                   "password": {
                     "type": "string"
+                  },
+                  "Cpassword": {
+                    "type": "string"
+                  },
+                  "gender": {
+                    "type": "string",
+                    "enum": [
+                      "male",
+                      "female"
+                    ]
+                  },
+                  "mobileNumber": {
+                    "type": "string"
                   }
+                },
+                "example": {
+                  "userName": "testuser",
+                  "email": "test@test.com",
+                  "password": "Password123",
+                  "Cpassword": "Password123",
+                  "gender": "male",
+                  "mobileNumber": "01012345678"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
                 }
               }
             }
           },
-          "responses": {
-            "201": {
-              "description": "User created successfully"
-            },
-            "400": {
-              "description": "Validation error"
-            }
+          "400": {
+            "description": "Validation error"
           }
         }
       }
     },
     "/auth/login": {
       "post": {
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "summary": "Log in an existing user",
         "requestBody": {
           "required": true,
@@ -205,24 +256,47 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["email", "password"],
+                "required": [
+                  "password"
+                ],
                 "properties": {
                   "email": {
+                    "type": "string"
+                  },
+                  "mobileNumber": {
                     "type": "string"
                   },
                   "password": {
                     "type": "string"
                   }
+                },
+                "example": {
+                  "email": "test@test.com",
+                  "password": "Password123"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
                 }
               }
             }
           },
-          "responses": {
-            "200": {
-              "description": "Logged in successfully, returns JWT token"
-            },
-            "401": {
-              "description": "Invalid credentials"
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
             }
           }
         }
@@ -230,7 +304,9 @@
     },
     "/auth/logout": {
       "post": {
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "summary": "Log out the current user",
         "security": [
           {
@@ -249,7 +325,9 @@
     },
     "/auth/users": {
       "get": {
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "summary": "Fetch list of all users",
         "security": [
           {
@@ -275,7 +353,9 @@
     },
     "/auth/profile": {
       "get": {
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "summary": "Fetch the authenticated user's profile",
         "security": [
           {
@@ -296,7 +376,9 @@
         }
       },
       "put": {
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "summary": "Update the authenticated user's profile",
         "security": [
           {
@@ -327,7 +409,9 @@
     },
     "/projects": {
       "post": {
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Create a new project",
         "security": [
           {
@@ -340,7 +424,10 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["name", "description"],
+                "required": [
+                  "name",
+                  "description"
+                ],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -351,15 +438,15 @@
                 }
               }
             }
-          },
-          "responses": {
-            "201": {
-              "description": "Project created",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Project"
-                  }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Project created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
                 }
               }
             }
@@ -367,7 +454,9 @@
         }
       },
       "get": {
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Get all projects for the authenticated user",
         "security": [
           {
@@ -417,7 +506,9 @@
     },
     "/projects/{projectId}": {
       "get": {
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Get project by ID",
         "security": [
           {
@@ -451,7 +542,9 @@
         }
       },
       "put": {
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Update project details",
         "security": [
           {
@@ -484,22 +577,24 @@
                 }
               }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Project updated successfully"
           },
-          "responses": {
-            "200": {
-              "description": "Project updated successfully"
-            },
-            "403": {
-              "description": "Only the project creator or an Admin can update projects"
-            },
-            "404": {
-              "description": "Project not found"
-            }
+          "403": {
+            "description": "Only the project creator or an Admin can update projects"
+          },
+          "404": {
+            "description": "Project not found"
           }
         }
       },
       "delete": {
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Delete a project",
         "security": [
           {
@@ -531,7 +626,9 @@
     },
     "/projects/{projectId}/members": {
       "post": {
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Add a member to a project",
         "security": [
           {
@@ -554,7 +651,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["email"],
+                "required": [
+                  "email"
+                ],
                 "properties": {
                   "email": {
                     "type": "string"
@@ -562,21 +661,23 @@
                 }
               }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Member added successfully"
           },
-          "responses": {
-            "200": {
-              "description": "Member added successfully"
-            },
-            "403": {
-              "description": "Only an Admin can add members"
-            }
+          "403": {
+            "description": "Only an Admin can add members"
           }
         }
       }
     },
     "/projects/{projectId}/members/{userId}": {
       "delete": {
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Remove a member from a project",
         "security": [
           {
@@ -616,7 +717,9 @@
     },
     "/projects/{projectId}/tasks": {
       "post": {
-        "tags": ["Tasks"],
+        "tags": [
+          "Tasks"
+        ],
         "summary": "Create a new task in a project",
         "security": [
           {
@@ -639,7 +742,12 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["title", "description", "dueDate", "assignee"],
+                "required": [
+                  "title",
+                  "description",
+                  "dueDate",
+                  "assignee"
+                ],
                 "properties": {
                   "title": {
                     "type": "string"
@@ -657,22 +765,28 @@
                   },
                   "priority": {
                     "type": "string",
-                    "enum": ["Low", "Medium", "High"],
+                    "enum": [
+                      "Low",
+                      "Medium",
+                      "High"
+                    ],
                     "default": "Medium"
                   }
                 }
               }
             }
-          },
-          "responses": {
-            "201": {
-              "description": "Task created successfully"
-            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Task created successfully"
           }
         }
       },
       "get": {
-        "tags": ["Tasks"],
+        "tags": [
+          "Tasks"
+        ],
         "summary": "Get all tasks in a project",
         "security": [
           {
@@ -693,7 +807,11 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["To Do", "In Progress", "Done"]
+              "enum": [
+                "To Do",
+                "In Progress",
+                "Done"
+              ]
             }
           },
           {
@@ -701,7 +819,11 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["Low", "Medium", "High"]
+              "enum": [
+                "Low",
+                "Medium",
+                "High"
+              ]
             }
           },
           {
@@ -735,7 +857,9 @@
     },
     "/projects/{projectId}/tasks/{taskId}": {
       "get": {
-        "tags": ["Tasks"],
+        "tags": [
+          "Tasks"
+        ],
         "summary": "Get details of a task",
         "security": [
           {
@@ -767,7 +891,9 @@
         }
       },
       "put": {
-        "tags": ["Tasks"],
+        "tags": [
+          "Tasks"
+        ],
         "summary": "Update task (updates will append status changes to audit log)",
         "security": [
           {
@@ -806,11 +932,19 @@
                   },
                   "status": {
                     "type": "string",
-                    "enum": ["To Do", "In Progress", "Done"]
+                    "enum": [
+                      "To Do",
+                      "In Progress",
+                      "Done"
+                    ]
                   },
                   "priority": {
                     "type": "string",
-                    "enum": ["Low", "Medium", "High"]
+                    "enum": [
+                      "Low",
+                      "Medium",
+                      "High"
+                    ]
                   },
                   "assignee": {
                     "type": "string"
@@ -831,7 +965,9 @@
         }
       },
       "delete": {
-        "tags": ["Tasks"],
+        "tags": [
+          "Tasks"
+        ],
         "summary": "Delete a task",
         "security": [
           {
@@ -865,7 +1001,9 @@
     },
     "/socket": {
       "get": {
-        "tags": ["WebSockets"],
+        "tags": [
+          "WebSockets"
+        ],
         "summary": "WebSocket Connection Protocol (Socket.io)",
         "description": "Establish a WebSocket connection using Socket.io client for real-time task group chat. Requires authorization token in handshake auth object.",
         "parameters": [
@@ -890,4 +1028,4 @@
       }
     }
   }
-}
+};

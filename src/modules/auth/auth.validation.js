@@ -9,7 +9,6 @@ export const signUpVal = z.object({
   Cpassword: generalFields.Cpassword,
   gender: z.enum(Object.values(gender)),
   mobileNumber: generalFields.mobileNumber,
-  recoveryEmail: generalFields.email.optional(),
 }).refine((data) => data.password === data.Cpassword, {
   message: "password and confirmed password doesn't Match",
   path: ["Cpassword"],
