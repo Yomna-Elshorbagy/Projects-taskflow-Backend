@@ -17,12 +17,19 @@ export const bootstrap = (app) => {
     dbConnection();
   }
 
-  //==> Serve Swagger API Docs (Fixed for Vercel)//public aaccess to swigger ui css
-  const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
+  const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui.min.css";
+  const customJs = [
+    "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui-bundle.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.3.0/swagger-ui-standalone-preset.js",
+  ];
+
   app.use(
     "/taskflow-docs",
     swaggerUi.serve,
-    swaggerUi.setup(swaggerDocument, { customCssUrl: CSS_URL })
+    swaggerUi.setup(swaggerDocument, {
+      customCssUrl: CSS_URL,
+      customJs: customJs,
+    })
   );
 
   app.use("/auth", allRouters.authRouter);

@@ -297,3 +297,16 @@ The `vercel.json` file handles routing all traffic to the Express app gracefully
   ]
 }
 ```
+
+## 📦 Docker Image
+
+This repository includes a GitHub Actions CI workflow that automatically builds and pushes the application's Docker image to Docker Hub whenever changes are pushed to the `main` branch.
+
+Once the CI workflow successfully completes, you can find your image directly on the Docker Hub website at:
+
+**`https://hub.docker.com/r/yomnaelshorbagy/taskflow-backend`**
+
+You can pull the latest image locally at any time using:
+```bash
+docker pull yomnaelshorbagy/taskflow-backend:latest
+```
