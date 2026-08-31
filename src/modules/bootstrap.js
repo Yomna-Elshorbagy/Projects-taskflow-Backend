@@ -11,13 +11,14 @@ import swaggerUi from "swagger-ui-express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import RedisStore from "rate-limit-redis";
-import mongoSanitize from "express-mongo-sanitize";
-import hpp from "hpp";
+import pinoHttp from "pino-http";
+import { logger } from "../../utils/logger.js";
+import { express5MongoSanitize } from "../middelwares/mongo-sanitize.js";
 
 
 export const bootstrap = (app) => {
   process.on("uncaughtException", (err) => {
-    console.log("ERROR in code: ", err);
+    logger.error("Uncaught Exception: ", err);
   });
 
   if (process.env.NODE_ENV !== "test") {
@@ -27,31 +28,45 @@ export const bootstrap = (app) => {
 
   // Security Middlewares
   app.use(helmet());
-  app.use(mongoSanitize());
-  app.use(hpp());
+  app.use(express5MongoSanitize);
+
+  // High-Performance HTTP Request Logging
+  app.use(pinoHttp({ 
+    logger,
+    serializers: {
+      req: (req) => ({
+        method: req.method,
+        url: req.url,
+      }),
+      res: (res) => ({
+        statusCode: res.statusCode,
+      }),
+    }
+  }));
 
   const globalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per `window`
+    max: 100,
     message: "Too many requests from this IP, please try again after 15 minutes",
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-    // Use Redis as the store so limits are shared across all server instances
+    standardHeaders: true,
+    legacyHeaders: false,
     store: new RedisStore({
       sendCommand: (...args) => redisService.client.sendCommand(args),
+      prefix: 'rl:global:', // Unique prefix to prevent double-counting warnings
     }),
   });
   app.use(globalLimiter);
 
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10, // Limit each IP to 10 authentication attempts per window
+    max: 10,
     message: "Too many authentication attempts from this IP, please try again after 15 minutes",
     standardHeaders: true,
     legacyHeaders: false,
-    skipSuccessfulRequests: true, // If they login successfully, don't penalize them
+    skipSuccessfulRequests: true,
     store: new RedisStore({
       sendCommand: (...args) => redisService.client.sendCommand(args),
+      prefix: 'rl:auth:', // Unique prefix to prevent double-counting warnings
     }),
   });
 
@@ -87,6 +102,6 @@ export const bootstrap = (app) => {
   app.use(globalError);
 
   process.on("unhandledRejection", (err) => {
-    console.log("ERROR: ", err);
+    logger.error("Unhandled Rejection: ", err);
   });
 };
