@@ -9,6 +9,8 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
+//===> for rate-limiting behind Vercel/Load Balancers==> to get the real user's IP from Vercel's proxy
+app.set("trust proxy", 1);
 app.use(cors());
 
 app.get("/", (req, res) => {
